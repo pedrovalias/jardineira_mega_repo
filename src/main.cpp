@@ -246,7 +246,7 @@ void realiza_rega(int tipoRega, int jardineira){
   } 
   
   if(tipoRega == 0){
-    Serial.println("Primeira Rega - inicialização");
+    Serial.println("Primeira Rega - inicialização jardineiras");
     regar(jardineira);
   } else {
     
@@ -297,7 +297,7 @@ void regar(int jardineira){
     
     Serial.print("Iniciando Rega da Jardineira: ");
     Serial.println(jardineira);
-    escreveLCD(1,0,0,"Jardineira");
+    escreveLCD(1,0,0,"Jardineira" + jardineira);
 
     // Variavel de controle para saida do laco de repeticao
     int controle = 1;
@@ -394,6 +394,7 @@ int verificaNivel(int jardineira){
 
   // Se detectado contato com a agua 
   if(nivelMaximo == HIGH){
+    escreveLCD(limpaLCD, 0,0,"Jardineira" + jardineira);
     escreveLCD(!limpaLCD,0,1,"Vaso esta cheio!");
     lcd.print("Vaso esta cheio!");
 
@@ -530,7 +531,7 @@ void executa_loop() {
 
     // TODO: Arrumar exibição da umidade das jardineiras
     lcd.setCursor(0, 0);
-    lcd.print("T:");
+    lcd.print("1:");
     lcd.print(umidadeSolo1);
     lcd.print("|");
     lcd.print("2:");
@@ -539,6 +540,12 @@ void executa_loop() {
     lcd.print("3:");
     lcd.print(umidadeSolo3);
     lcd.print("|");
+    lcd.scrollDisplayRight();
+    lcd.print("4:");
+    lcd.print(umidadeSolo4);
+    lcd.print("|");
+    lcd.print("5:");
+    lcd.print(umidadeSolo5);
 
     // Exibe tempo espera no console para acompanhamento
     Serial.print(i);
