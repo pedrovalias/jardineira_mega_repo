@@ -121,7 +121,7 @@ void loop() {
   
   Serial.println("# SISTEMA INICIADO");
 
-  escreveLCD(limpaLCD,0,0,"Rega Automatica ");
+  escreveLCD(limpaLCD,0,0,"  Rega  Automatica  ");
   
   delay(2000);
 
@@ -134,7 +134,7 @@ void loop() {
       realiza_rega(contador,5);
   }
 
-  escreveLCD(limpaLCD,0,0,"Rega Automatica ");
+  escreveLCD(limpaLCD,0,0,"  Rega  Automatica  ");
 
   executa_loop();
 
@@ -266,7 +266,7 @@ void regar(int jardineira){
     // Enquanto estiver na condição de controle, funciona regagem
     while(controle != 0){
         
-      escreveLCD(!limpaLCD,0,1,"    Regando     ");
+      escreveLCD(!limpaLCD,0,2,"      Regando       ");
 
       // Ativa LED indicativo de processo de rega em andamento
       ativarLed("azul", jardineira);
@@ -296,15 +296,15 @@ void regar(int jardineira){
             /* Vai atualizando a mensagem do LCD conforme andamento da regagem
             *  Divide o tempo determinado em 3 partes, exibindo um ponto de controle a cada parte atingida 
             */
-          escreveLCD(!limpaLCD,0,2,"    Regando.    ");
+          escreveLCD(!limpaLCD,0,2,"      Regando.      ");
           Serial.println("Regando.");
           
           if(j >= (tempoRega*1000)/3 && j < (tempoRega*1000)/3*2){
-            escreveLCD(!limpaLCD,0,2,"    Regando..   ");
+            escreveLCD(!limpaLCD,0,2,"      Regando..     ");
             Serial.println("Regando..");
           }
           if(j >= (tempoRega*1000/3)*2){
-            escreveLCD(!limpaLCD,0,2,"    Regando...  ");
+            escreveLCD(!limpaLCD,0,2,"      Regando...    ");
             Serial.println("Regando...");
           }
           
@@ -355,8 +355,8 @@ int verificaNivel(int jardineira){
 
   // Se detectado contato com a agua 
   if(nivelMaximo == HIGH){
-    escreveLCD(!limpaLCD,0,1,"  Jardineira " + String(jardineira) + "  ");
-    escreveLCD(!limpaLCD,0,2,"Vaso esta cheio!");
+    escreveLCD(!limpaLCD,0,1,"    Jardineira " + String(jardineira) + "    ");
+    escreveLCD(!limpaLCD,0,2,"  Vaso esta cheio!  ");
     lcd.print("Vaso esta cheio!");
 
     // Desliga a valvula de agua, caso esteja ligada
@@ -412,9 +412,9 @@ void executa_loop() {
     // TODO: EXIBIR NO LCD EM TEMPO REAL QUAL A CONFIGURAÇÃO ATUAL DE REGAS - obterDadosDHT
 
     // Exibe a porcentagem da umidade do solo no Display LCD:
-    escreveLCD(!limpaLCD,0,1, "Umd_Solo: J1:" + String(umidadeSolo1) + "%");  
-    escreveLCD(!limpaLCD,0,2, "J2:" + String(umidadeSolo2) + "%" + "|  J3:" + String(umidadeSolo3) + "%");
-    escreveLCD(!limpaLCD,0,3, "J4:" + String(umidadeSolo4) + "%" + "|  J5:" + String(umidadeSolo5) + "%");  
+    escreveLCD(!limpaLCD,0,1, "Umd_Solo:   J1:" + String(umidadeSolo1) + "%");  
+    escreveLCD(!limpaLCD,0,2, "J2:" + String(umidadeSolo2) + "%" + "  |  J3:" + String(umidadeSolo3) + "%");
+    escreveLCD(!limpaLCD,0,3, "J4:" + String(umidadeSolo4) + "%" + "  |  J5:" + String(umidadeSolo5) + "%");  
 
     // Exibe tempo espera no console para acompanhamento
     Serial.print(i);
@@ -436,7 +436,7 @@ int obterDadosDHT(int i){
   // Se houver, seta a umidade e temperatura com valor zero
   if (isnan(h) || isnan(t)) { 
     h=0; t=0;
-    escreveLCD(limpaLCD,0,0,"Umd:ERR  Tmp:ERR");
+    escreveLCD(limpaLCD,0,0,"Umd:ERR      Tmp:ERR");
   }else {
     escreveLCD(limpaLCD,0,0,"Umd:" + String(h) + "%  Tmp:" + String(t) + "º");
   }
