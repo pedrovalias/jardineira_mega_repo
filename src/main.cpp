@@ -49,10 +49,10 @@
 
 // Define a conexão entre o Arduino e o Display LCD utilizando a biblioteca I2C
 // LiquidCrystal_I2C lcd(0x27,16,2); // Endereco, colunas, linhas
-LiquidCrystal_I2C lcd(0x27,16,4); // Endereco, colunas, linhas
+LiquidCrystal_I2C lcd(0x27,20,4); // Endereco, colunas, linhas
 
 // Constantes sensor Temperatura/Umidade do ar
-#define DHTPIN 0 // Pino D3
+#define DHTPIN 14 // Pino D3
 #define DHTTYPE DHT11 
 DHT dht(DHTPIN,DHTTYPE);
 int contadorAltaTemperatura = 0;
@@ -218,8 +218,8 @@ void realiza_rega(int tipoRega, int jardineira){
     } else {
       // Posiciona o cursor do LCD na coluna 0 linha 1
       digitalWrite(pinoValvula, HIGH);
-      escreveLCD(!limpaLCD,0,1,"  Jardineira " + String(jardineira) + "  ");
-      escreveLCD(!limpaLCD,0,2,"Solo Encharcado ");
+      escreveLCD(!limpaLCD,0,1,"    Jardineira " + String(jardineira) + "    ");
+      escreveLCD(!limpaLCD,0,2,"  Solo  Encharcado  ");
       Serial.println("Solo encharcado");
       ativarLed("vermelho", jardineira);
     }
@@ -258,7 +258,7 @@ void regar(int jardineira){
     
     Serial.print("Iniciando Rega da Jardineira: ");
     Serial.println(jardineira);
-    escreveLCD(!limpaLCD,0,1,"  Jardineira " + String(jardineira) + "  ");
+    escreveLCD(!limpaLCD,0,1,"    Jardineira " + String(jardineira) + "    ");
 
     // Variavel de controle para saida do laco de repeticao
     int controle = 1;
@@ -319,7 +319,7 @@ void regar(int jardineira){
     // Desliga a valvula de agua e ativa LED informativo de conclusão de rega
     digitalWrite(pinoValvula, HIGH);
     Serial.println("Processo de rega finalizado");
-    escreveLCD(limpaLCD,0,2,"REGA FINALIZADA!");
+    escreveLCD(limpaLCD,0,2,"  REGA FINALIZADA!  ");
     Serial.println("Processo de rega finalizado");
     ativarLed("verde", jardineira);
     delay(3000);
@@ -357,7 +357,6 @@ int verificaNivel(int jardineira){
   if(nivelMaximo == HIGH){
     escreveLCD(!limpaLCD,0,1,"    Jardineira " + String(jardineira) + "    ");
     escreveLCD(!limpaLCD,0,2,"  Vaso esta cheio!  ");
-    lcd.print("Vaso esta cheio!");
 
     // Desliga a valvula de agua, caso esteja ligada
     digitalWrite(pinoValvula, HIGH);
@@ -412,7 +411,7 @@ void executa_loop() {
     // TODO: EXIBIR NO LCD EM TEMPO REAL QUAL A CONFIGURAÇÃO ATUAL DE REGAS - obterDadosDHT
 
     // Exibe a porcentagem da umidade do solo no Display LCD:
-    escreveLCD(!limpaLCD,0,1, "Umd_Solo:   J1:" + String(umidadeSolo1) + "%");  
+    escreveLCD(!limpaLCD,0,1, "Umidade Solo: J1:" + String(umidadeSolo1) + "%");  
     escreveLCD(!limpaLCD,0,2, "J2:" + String(umidadeSolo2) + "%" + "  |  J3:" + String(umidadeSolo3) + "%");
     escreveLCD(!limpaLCD,0,3, "J4:" + String(umidadeSolo4) + "%" + "  |  J5:" + String(umidadeSolo5) + "%");  
 
@@ -438,11 +437,11 @@ int obterDadosDHT(int i){
     h=0; t=0;
     escreveLCD(limpaLCD,0,0,"Umd:ERR      Tmp:ERR");
   }else {
-    escreveLCD(limpaLCD,0,0,"Umd:" + String(h) + "%  Tmp:" + String(t) + "º");
+    escreveLCD(limpaLCD,0,0,"Umd:" + String(int(h)) + "%      Tmp:" + String(int(t)) + "º");
   }
 
-  Serial.print("# Temperatura: "); Serial.print(t);
-  Serial.print("| Umidade do Ar: "); Serial.println(h);
+  Serial.print("# Temperatura: "); Serial.print(int(t));
+  Serial.print("| Umidade do Ar: "); Serial.println(int(h));
 
   /* 
      Realiza duas verificacoes: 
