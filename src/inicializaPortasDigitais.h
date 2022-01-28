@@ -17,26 +17,12 @@ void inicializaPortasDigitais() {
   pinMode(pinoValvula5, OUTPUT);
   digitalWrite(pinoValvula5, HIGH);
 
-  // Define os LEDS informativos como saída
-  pinMode(PINO_LED_R1, OUTPUT); // LED vermelho
-  pinMode(PINO_LED_G1, OUTPUT); // LED verde
-  pinMode(PINO_LED_B1, OUTPUT); // LED azul
-
-  pinMode(PINO_LED_R2, OUTPUT); // LED vermelho
-  pinMode(PINO_LED_G2, OUTPUT); // LED verde
-  pinMode(PINO_LED_B2, OUTPUT); // LED azul
-
-  pinMode(PINO_LED_R3, OUTPUT); // LED vermelho
-  pinMode(PINO_LED_G3, OUTPUT); // LED verde
-  pinMode(PINO_LED_B3, OUTPUT); // LED azul
-
-  pinMode(PINO_LED_R4, OUTPUT); // LED vermelho
-  pinMode(PINO_LED_G4, OUTPUT); // LED verde
-  pinMode(PINO_LED_B4, OUTPUT); // LED azul
-
-  pinMode(PINO_LED_R5, OUTPUT); // LED vermelho
-  pinMode(PINO_LED_G5, OUTPUT); // LED verde
-  pinMode(PINO_LED_B5, OUTPUT); // LED azul
+  // Inicializando as instâncias das fitas LED e definindo os pinos de saída
+  FastLED.addLeds<NEOPIXEL, 22>(leds[0], NUM_LEDS_POR_FITA);    //Fita LED 1 no pin 22
+  FastLED.addLeds<NEOPIXEL, 23>(leds[1], NUM_LEDS_POR_FITA);    //Fita LED 2 no pin 23
+  FastLED.addLeds<NEOPIXEL, 24>(leds[2], NUM_LEDS_POR_FITA);    //Fita LED 3 no pin 24
+  FastLED.addLeds<NEOPIXEL, 25>(leds[3], NUM_LEDS_POR_FITA);    //Fita LED 4 no pin 25
+  FastLED.addLeds<NEOPIXEL, 26>(leds[4], NUM_LEDS_POR_FITA);    //Fita LED 5 no pin 26
 
   //Define o detector de água como entrada - funciona como um botão
   pinMode(sensorNivelMaximo1, INPUT);
