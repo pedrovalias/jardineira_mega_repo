@@ -8,27 +8,33 @@
 
   # Guia de conexão:
    LCD ?
-   Sensor Temperatura e umidade do ambiente (DHT11): ? 
+
+   Sensor Temperatura e umidade do ambiente (DHT11): 3
+
    Sensor de umidade do solo 1: A0
    Sensor de umidade do solo 2: A1
    Sensor de umidade do solo 3: A2
    Sensor de umidade do solo 4: A3
    Sensor de umidade do solo 5: A4
+
    Módulo Relé 8 canais(Válvula):
-      Valuvula Solenoide 1: 7
-      Valuvula Solenoide 2: 8
-      Valuvula Solenoide 3: 9
-      Valuvula Solenoide 4: 10
-      Valuvula Solenoide 5: 11
+      Valvula Solenoide 1: 7
+      Valvula Solenoide 2: 8
+      Valvula Solenoide 3: 9
+      Valvula Solenoide 4: 10
+      Valvula Solenoide 5: 11
+      
    Sensor indicador de nivel máximo de água 1: 2
    Sensor indicador de nivel máximo de água 2: 3
    Sensor indicador de nivel máximo de água 3: 4
    Sensor indicador de nivel máximo de água 4: 5
    Sensor indicador de nivel máximo de água 5: 6
 
-   LEDs RGBs (Fita Endereçável): ? 
- 
-   LED indicador de nível máximo de água: ?           // NAO UTILIZADO
+   LEDs RGBs (Fita Endereçável 1): 22 
+   LEDs RGBs (Fita Endereçável 2): 23
+   LEDs RGBs (Fita Endereçável 3): 24
+   LEDs RGBs (Fita Endereçável 4): 25
+   LEDs RGBs (Fita Endereçável 5): 26
 
   # Este código utiliza a biblioteca LiquidCrystal
 
@@ -45,13 +51,12 @@
 #include <DHT.h>
 #include <FastLED.h>
 
-// #define NUM_LEDS    20
-// #define BRIGHTNESS  64
-
 #define NUM_FITAS_LED 5
-#define NUM_LEDS_POR_FITA 20
+#define NUM_LEDS_POR_FITA 3
 // #define LED_TYPE    WS2811
-// #define COLOR_ORDER GRB
+#define LED_TYPE WS2812B
+#define BRIGHTNESS 255                  // Controle do brilho dos LEDs
+#define SATURATION 255                  // Controle da saturação dos LEDs
 
 // Configurando as instâncias para as fitas de LED
 CRGB leds[NUM_FITAS_LED][NUM_LEDS_POR_FITA];
@@ -61,27 +66,27 @@ CRGB leds[NUM_FITAS_LED][NUM_LEDS_POR_FITA];
 #include <inicializaPortasDigitais.h>   // Inicialização/configuração de portas digitais dos sensores 
 #include <leds_enderecaveis.h>          // Configuração dos LEDs endereçáveis
 
-
 // Define a conexão entre o Arduino e o Display LCD utilizando a biblioteca I2C
-LiquidCrystal_I2C lcd(0x27,20,4); // Endereco, colunas, linhas
+LiquidCrystal_I2C lcd(0x27,20,4);       // Endereco, colunas, linhas
 
-// Constantes sensor Temperatura/Umidade do ar
-#define DHTPIN 0 // Pino D3
+// Constantes do sensor de Temperatura/Umidade do ar
+#define DHTPIN 3
 #define DHTTYPE DHT11 
 DHT dht(DHTPIN,DHTTYPE);
 int contadorAltaTemperatura = 0;
 int contadorBaixaTemperatura = 0;
 boolean autoAjusteLoop = true;
 
+// LED que indica caso a jardineira esteja cheia
 // const int ledNivelAgua = 10;
 
 // Variaveis constantes do programa
-int limiarSeco = 0;             // Porcentagem determinada para umidade do solo aceitavel 
-int tempoRega = 0;              // Tempo de acao da rega em segundos
-int tempoLoop = 0;              // Tempo que vai levar a cada acao de regagem em horas
+int limiarSeco = 0;                     // Porcentagem determinada para umidade do solo aceitavel 
+int tempoRega = 0;                      // Tempo de acao da rega em segundos
+int tempoLoop = 0;                      // Tempo que vai levar a cada acao de regagem em horas
 int tempoLoopControle = 0;
 const int delayLoop = 5;
-const int quatroHoras = 4;      // 4*3600/delayLoop = 2880 = 4h
+const int quatroHoras = 4;              // 4*3600/delayLoop = 2880 = 4h
 
 // Inicializa contador de execucoes do programa
 int contador = 0;
@@ -97,7 +102,7 @@ void realiza_rega(int tipoRega, int jardineira);
 void regar(int jardineira);
 int verificaNivel(int jardineira);
 void ativarLed(char corLed[10], int jardineira);
-void desligarLeds();
+void desligarTodasFitasLed();
 void executa_loop();
 int obterDadosDHT(int i);
 
@@ -106,23 +111,20 @@ int obterDadosDHT(int i);
 //=======================================================================================================
 void setup() {
 
-  Serial.begin(115200);   // Inicializa o console serial 
-  lcd.init();             // Inicializa o visor LCD
-  lcd.backlight();        // Inicializa a iluminacao do LCD
-  dht.begin();            // Inicializa o sensor DHT (Temperatura e umidade relativa do ambiente)
+  Serial.begin(115200);                // Inicializa o console serial 
+  lcd.init();                          // Inicializa o visor LCD
+  lcd.backlight();                     // Inicializa a iluminacao do LCD
+  dht.begin();                         // Inicializa o sensor DHT (Temperatura e umidade relativa do ambiente)
 
-  limiarSeco = 75;        // Porcentagem determinada para humidade do solo aceitavel 
-  tempoRega = 9;          // Tempo de acao da rega em segundos
-  tempoLoop = 2;          // Tempo em horas de intervalo entre as acoes de rega
+  limiarSeco = 75;                     // Porcentagem determinada para humidade do solo aceitavel 
+  tempoRega = 2;                       // Tempo de acao da rega em segundos
+  tempoLoop = 2;                       // Tempo em horas de intervalo entre as acoes de rega
 
   // Define os pinos como saída e inicializa as válvulas de agua como desligadas
   inicializaPortasDigitais();
   
   // Algumas fitas LED estão sempre ligadas quando alimentadas, então desliga-se por um momento
-  desligarLeds();
-
-  // Envia os dados para as fitas LED
-  FastLED.show();
+  desligarTodasFitasLed();
 
   // pinMode(ledNivelAgua, OUTPUT);
 
@@ -142,7 +144,7 @@ void loop() {
   
   Serial.println("# SISTEMA INICIADO");
 
-  escreveLCD(limpaLCD,0,0,"  Rega  Automatica  ");
+  escreveLCD(limpaLCD,0,0,"  REGA  AUTOMATICA  ");
   
   delay(2000);
 
@@ -155,7 +157,7 @@ void loop() {
     realiza_rega(contador,5);
   }
 
-  escreveLCD(limpaLCD,0,0,"  Rega  Automatica  ");
+  escreveLCD(limpaLCD,0,0,"  REGA  AUTOMATICA  ");
 
   executa_loop();
 
@@ -336,8 +338,7 @@ void regar(int jardineira){
     // Desliga a valvula de agua e ativa LED informativo de conclusão de rega
     digitalWrite(pinoValvula, HIGH);
     Serial.println("Processo de rega finalizado");
-    escreveLCD(limpaLCD,0,2,"REGA FINALIZADA!");
-    Serial.println("Processo de rega finalizado");
+    escreveLCD(limpaLCD,0,2,"  REGA FINALIZADA!  ");
     ativarLed("verde", jardineira);
     delay(3000);
   }
@@ -372,9 +373,9 @@ int verificaNivel(int jardineira){
 
   // Se detectado contato com a agua 
   if(nivelMaximo == HIGH){
+    escreveLCD(limpaLCD,0,0, "  REGA  AUTOMATICA  ");
     escreveLCD(!limpaLCD,0,1,"    Jardineira " + String(jardineira) + "    ");
     escreveLCD(!limpaLCD,0,2,"  Vaso esta cheio!  ");
-    lcd.print("Vaso esta cheio!");
 
     // Desliga a valvula de agua, caso esteja ligada
     digitalWrite(pinoValvula, HIGH);
@@ -414,26 +415,26 @@ void executa_loop() {
     // Faz a leitura do sensor de umidade do solo
     umidadeSolo1 = analogRead(pinoSensorHumidade1);
     umidadeSolo2 = analogRead(pinoSensorHumidade2);
-    umidadeSolo2 = analogRead(pinoSensorHumidade3);
-    umidadeSolo2 = analogRead(pinoSensorHumidade4);
-    umidadeSolo2 = analogRead(pinoSensorHumidade5);
+    umidadeSolo3 = analogRead(pinoSensorHumidade3);
+    umidadeSolo4 = analogRead(pinoSensorHumidade4);
+    umidadeSolo5 = analogRead(pinoSensorHumidade5);
     
     /* Transforma o valor obtido dos sensores de umidade do solo para porcentagem
      * Onde o map recebe 4 parametros: 
      * map(valorObtidoSensor, valorSeco, valorMolhado, porcentagemMinima, porcentagemMaxima) */
     umidadeSolo1 = map(umidadeSolo1, 613, 261, 0, 100);          // Capacitivo 1
     umidadeSolo2 = map(umidadeSolo2, 593, 251, 0, 100);          // Capacitivo 2
-    umidadeSolo2 = map(umidadeSolo3, 601, 256, 0, 100);          // Capacitivo 3
-    umidadeSolo2 = map(umidadeSolo4, 601, 256, 0, 100);          // Capacitivo 4
-    umidadeSolo2 = map(umidadeSolo5, 1023, 0, 0, 100);           // Anticorrosao  TODO: NECESSARIO CALIBRAR
+    umidadeSolo3 = map(umidadeSolo3, 601, 256, 0, 100);          // Capacitivo 3
+    umidadeSolo4 = map(umidadeSolo4, 601, 256, 0, 100);          // Capacitivo 4
+    umidadeSolo5 = map(umidadeSolo5, 1023, 0, 0, 100);           // Anticorrosao  TODO: NECESSARIO CALIBRAR
 
     // TODO: Arrumar exibição da umidade das jardineiras
     // TODO: EXIBIR NO LCD EM TEMPO REAL QUAL A CONFIGURAÇÃO ATUAL DE REGAS - obterDadosDHT
 
     // Exibe a porcentagem da umidade do solo no Display LCD:
     escreveLCD(!limpaLCD,0,1, "Umd_Solo:   J1:" + String(umidadeSolo1) + "%");  
-    escreveLCD(!limpaLCD,0,2, "J2:" + String(umidadeSolo2) + "%" + "  |  J3:" + String(umidadeSolo3) + "%");
-    escreveLCD(!limpaLCD,0,3, "J4:" + String(umidadeSolo4) + "%" + "  |  J5:" + String(umidadeSolo5) + "%");  
+    escreveLCD(!limpaLCD,0,2, "J2:" + String(umidadeSolo2) + "%" + " | J3:" + String(umidadeSolo3) + "%");
+    escreveLCD(!limpaLCD,0,3, "J4:" + String(umidadeSolo4) + "%" + " | J5:" + String(umidadeSolo5) + "%");  
 
     // Exibe tempo espera no console para acompanhamento
     Serial.print(i);
@@ -457,7 +458,7 @@ int obterDadosDHT(int i){
     h=0; t=0;
     escreveLCD(limpaLCD,0,0,"Umd:ERR      Tmp:ERR");
   }else {
-    escreveLCD(limpaLCD,0,0,"Umd:" + String(h) + "%  Tmp:" + String(t) + "º");
+    escreveLCD(limpaLCD,0,0,"Umd:" + String(h,0) + "%     Tmp:" + String(t,0) + "C" + char(223));
   }
 
   Serial.print("# Temperatura: "); Serial.print(t);
