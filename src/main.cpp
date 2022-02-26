@@ -64,7 +64,8 @@ CRGB leds[NUM_FITAS_LED][NUM_LEDS_POR_FITA];
 // Importação dos arquivos externos 
 #include <jardineiras.h>                // Declarações de todas as pinagens das jardineiras
 #include <inicializaPortasDigitais.h>   // Inicialização/configuração de portas digitais dos sensores 
-#include <leds_enderecaveis.h>          // Configuração dos LEDs endereçáveis
+// #include <leds_enderecaveis.h>          // Configuração dos LEDs endereçáveis
+#include <leds_enderecaveis_v2.h>          // Configuração dos LEDs endereçáveis
 
 // Define a conexão entre o Arduino e o Display LCD utilizando a biblioteca I2C
 LiquidCrystal_I2C lcd(0x27,20,4);       // Endereco, colunas, linhas
@@ -101,7 +102,7 @@ void escreveLCD(bool limpa, int coluna, int linha, String texto);
 void realiza_rega(int tipoRega, int jardineira);
 void regar(int jardineira);
 int verificaNivel(int jardineira);
-void ativarLed(char corLed[10], int jardineira);
+void ativarLed(String corLed, int jardineira);
 void desligarTodasFitasLed();
 void executa_loop();
 int obterDadosDHT(int i);
@@ -243,7 +244,8 @@ void realiza_rega(int tipoRega, int jardineira){
       escreveLCD(!limpaLCD,0,1,"  Jardineira " + String(jardineira) + "  ");
       escreveLCD(!limpaLCD,0,2,"Solo Encharcado ");
       Serial.println("Solo encharcado");
-      ativarLed("vermelho", jardineira);
+      // ativarLed("vermelho", jardineira);
+      ledAlertaVasoCheio(jardineira);
     }
   }
   return;
@@ -290,7 +292,8 @@ void regar(int jardineira){
       escreveLCD(!limpaLCD,0,2,"      Regando       ");
 
       // Ativa LED indicativo de processo de rega em andamento
-      ativarLed("azul", jardineira);
+      // ativarLed("azul", jardineira);
+      ledRegaEmAndamento(jardineira);
       
       // Liga a valvula de agua
       digitalWrite(pinoValvula, LOW);
@@ -339,7 +342,8 @@ void regar(int jardineira){
     digitalWrite(pinoValvula, HIGH);
     Serial.println("Processo de rega finalizado");
     escreveLCD(limpaLCD,0,2,"  REGA FINALIZADA!  ");
-    ativarLed("verde", jardineira);
+    // ativarLed("verde", jardineira);
+    ledRegaFinalizada(jardineira);
     delay(3000);
   }
 }
@@ -382,7 +386,8 @@ int verificaNivel(int jardineira){
 
     // Liga LEDS informativos tanto da caixa quanto do vaso da jardineira
     // digitalWrite(ledNivelAgua, HIGH);
-    ativarLed("vermelho", jardineira);
+    // ativarLed("vermelho", jardineira);
+    ledAlertaVasoCheio(jardineira);
     delay(3000);
   } else {
     Serial.println("Vaso incompleto, permitir rega");
