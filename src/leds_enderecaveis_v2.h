@@ -6,28 +6,7 @@
 */
 
 int atribuiFitaJardineira(int jardineira){
-  int NUM_FITA = 0;
-
-   if(jardineira == 1){
-    NUM_FITA = 0;
-    Serial.println("LED Jardineira: " + String(jardineira));
-  } 
-  else if(jardineira == 2){
-    NUM_FITA = 1;
-    Serial.println("LED Jardineira: " + String(jardineira));
-  }
-  else if(jardineira == 3){
-    NUM_FITA = 2;
-    Serial.println("LED Jardineira: " + String(jardineira));
-  }
-  else if(jardineira == 4){
-    NUM_FITA = 3;
-    Serial.println("LED Jardineira: " + String(jardineira));
-  }
-  else {
-    NUM_FITA = 4;
-    Serial.println("LED Jardineira: " + String(jardineira));
-  }
+  int NUM_FITA = jardineira - 1;
 
   return NUM_FITA;
 }
@@ -35,7 +14,7 @@ int atribuiFitaJardineira(int jardineira){
 // Pisca a fita LED na cor vermelha 3 vezes
 void ledAlertaVasoCheio(int jardineira) {
 
-  int NUM_FITA_JARDINEIRA = atribuiFitaJardineira(jardineira);
+  int NUM_FITA_JARDINEIRA = atribuiFitaJardineira(jardineira); 
 
   Serial.println("######## FUNCAO LED_ALERTA_VASO_CHEIO #########");
   Serial.println("# NUM_FITA_JARDINEIRA: " + NUM_FITA_JARDINEIRA);
