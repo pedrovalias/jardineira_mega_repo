@@ -66,6 +66,22 @@ CRGB leds[NUM_FITAS_LED][NUM_LEDS_POR_FITA];
 #include <inicializaPortasDigitais.h>   // Inicialização/configuração de portas digitais dos sensores 
 // #include <leds_enderecaveis.h>          // Configuração dos LEDs endereçáveis
 #include <leds_enderecaveis_v2.h>          // Configuração dos LEDs endereçáveis
+#include <lcd_tft.h>
+
+// DEFINIÇÕES DE CORES
+#define	BLACK   0x0000
+#define	BLUE    0x001F
+#define	RED     0xF800
+#define	GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+#define DARKBLUE 0x0010
+#define VIOLET 0x8888
+#define GOLD 0xFEA0
+#define BROWN 0xA145
+#define SILVER 0xC618
 
 // Define a conexão entre o Arduino e o Display LCD utilizando a biblioteca I2C
 LiquidCrystal_I2C lcd(0x27,20,4);       // Endereco, colunas, linhas
@@ -113,8 +129,14 @@ int obterDadosDHT(int i);
 void setup() {
 
   Serial.begin(115200);                // Inicializa o console serial 
-  lcd.init();                          // Inicializa o visor LCD
-  lcd.backlight();                     // Inicializa a iluminacao do LCD
+  tft.reset();
+  tft.begin(0x9341); // CÓDIGO DO DRIVER DO SEU DISPLAY
+  tft.setRotation(2);
+  tft.fillScreen(BLACK);
+
+  DrawHeader();
+  teste();
+  DrawBotoesJardineira();
   dht.begin();                         // Inicializa o sensor DHT (Temperatura e umidade relativa do ambiente)
 
   limiarSeco = 75;                     // Porcentagem determinada para humidade do solo aceitavel 
